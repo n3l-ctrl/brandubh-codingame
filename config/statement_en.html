@@ -38,7 +38,7 @@
           <li>The concept of a turn limit doesn't exist in the official rules but is used here to prevent infinite games.</li>
         </ul>
         <br>
-        <p><strong>Board & Coordinates:</strong> The game is played on a 7x7 board. Every game starts from the standard opening position as described in the official rules. The coordinate system starts at (0, 0) in the top-left corner. The x-coordinate increases to the right, and the y-coordinate increases downwards.</p>
+        <p><strong>Board & Coordinates:</strong> The game is played on a 7x7 board. Every game starts from the standard opening position as described in the official rules. The board uses standard chess notation, where columns are `a` to `g` (left to right) and rows are `1` to `7` (bottom to top). The bottom-left square is `a1`.</p>
         <p><strong>Movement:</strong> The Attackers always move first. All pieces move orthogonally (like a rook in chess) any number of empty squares. Pieces cannot jump over other pieces.</p>
         <p><strong>The Throne and Corners:</strong> The center square (3,3) is the Throne. The 4 corner squares are the escape zones. Only the King can stop on the Throne or the corners. Other pieces can pass <em>over</em> the Throne if it is empty, but cannot land on it.</p>
         <p><strong>Hostile Pieces:</strong> The opponent's pieces are considered hostile pieces. The Throne and the corners <em>also</em> act as hostile pieces for the purpose of capturing.</p>
@@ -93,7 +93,8 @@
       <div class="title">Input for one game turn</div>
       <div class="text">
         <p><span class="statement-lineno">Line 1: </span><var>role</var> - an integer representing your role (<const>0</const> for Attackers, <const>1</const> for Defenders).</p>
-        <p><span class="statement-lineno">Next 7 lines:</span> A <const>7</const>-character string representing the board state. Characters can be:</p>
+        <p><span class="statement-lineno">Line 2: </span><var>lastAction</var> - a string representing the opponent's last move (e.g., <const>d2 d4</const>). It is <const>NONE</const> on the very first turn of the game.</p>
+        <p><span class="statement-lineno">Next 7 lines:</span> A <const>7</const>-character string representing the board state (from top to bottom, row 7 to 1). Characters can be:</p>
         <ul>
           <li><const>.</const>: Empty square</li>
           <li><const>A</const>: Attacker piece</li>
@@ -107,13 +108,13 @@
     <div class="blk">
       <div class="title">Output</div>
       <div class="text">
-        <span class="statement-lineno">A single line</span> containing your move in the format: <var>x1</var> <var>y1</var> <var>x2</var> <var>y2</var>. 
+        <span class="statement-lineno">A single line</span> containing your move in chess notation: <var>start_square</var> <var>end_square</var>. 
         <br>
         <ul>
-            <li><var>x1</var>, <var>y1</var>: The starting coordinates of the piece you want to move.</li>
-            <li><var>x2</var>, <var>y2</var>: The destination coordinates for that piece.</li>
+            <li><var>start_square</var>: The starting coordinate of the piece you want to move (e.g. <const>d2</const>).</li>
+            <li><var>end_square</var>: The destination coordinate for that piece (e.g. <const>d4</const>).</li>
         </ul>
-        For example: <const>3 1 3 0</const> to move the piece from (3,1) to (3,0).
+        For example: <const>d6 d7</const> to move the piece from d6 to d7.
         <br>
       </div>
     </div>

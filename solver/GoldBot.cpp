@@ -349,7 +349,8 @@ Move getBestMove(const State& state) {
 int main() {
     while (true) {
         int player_idx;
-        if (!(cin >> player_idx)) break;
+        string last_action;
+        if (!(cin >> player_idx >> last_action)) break;
         
         State state;
         state.player_to_move = player_idx;
@@ -380,7 +381,11 @@ int main() {
             int sy = m.start / 7;
             int ex = m.end % 7;
             int ey = m.end / 7;
-            cout << sx << " " << sy << " " << ex << " " << ey << endl;
+            char cx1 = 'a' + sx;
+            char cy1 = '7' - sy;
+            char cx2 = 'a' + ex;
+            char cy2 = '7' - ey;
+            cout << cx1 << cy1 << " " << cx2 << cy2 << endl;
         } else {
             cout << "WAIT" << endl;
         }

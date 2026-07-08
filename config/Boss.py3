@@ -310,6 +310,7 @@ class AI:
 while True:
     try:
         player_idx = int(input())
+        last_action = input()
     except EOFError:
         break
         
@@ -348,6 +349,8 @@ while True:
         sy = move[0] // 7
         ex = move[1] % 7
         ey = move[1] // 7
-        print(f"{sx} {sy} {ex} {ey}", flush=True)
+        def to_chess(x, y):
+            return chr(ord('a') + x) + str(7 - y)
+        print(f"{to_chess(sx, sy)} {to_chess(ex, ey)}", flush=True)
     else:
         print("WAIT", flush=True)
