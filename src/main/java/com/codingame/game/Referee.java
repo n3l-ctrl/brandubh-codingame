@@ -152,7 +152,7 @@ public class Referee extends AbstractReferee {
             applyMove(playerIdx, move);
             checkCaptures(move);
             
-            lastActionStr = String.format("%c%c %c%c", 
+            lastActionStr = String.format("%c%c%c%c", 
                 (char)('a' + move.startX), (char)('7' - move.startY), 
                 (char)('a' + move.endX), (char)('7' - move.endY));
             gameManager.addToGameSummary(player.getNicknameToken() + " played " + lastActionStr);

@@ -1,6 +1,6 @@
 gameloop
 read role:int
-read lastAction:word
+read lastAction:word(4)
 loop 7 read boardRow:word(7)
 write d2 d4
 
