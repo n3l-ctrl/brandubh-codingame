@@ -16,8 +16,6 @@ public class Referee extends AbstractReferee {
     
     private Board board;
     private java.util.Map<Piece, com.codingame.gameengine.module.entities.Sprite> pieceEntities = new java.util.HashMap<>();
-    private com.codingame.gameengine.module.entities.Group endScreenGroup;
-    private com.codingame.gameengine.module.entities.Text[] finalScoreTexts = new com.codingame.gameengine.module.entities.Text[2];
     private static final int CELL_SIZE = 126;
     private static final int OFFSET_X = 1920 / 2 - (Board.SIZE * CELL_SIZE) / 2;
     private static final int OFFSET_Y = 1080 / 2 - (Board.SIZE * CELL_SIZE) / 2;
@@ -29,7 +27,6 @@ public class Referee extends AbstractReferee {
         gameManager.setMaxTurns(200);
         drawBoard();
         drawHud();
-        drawEndScreen();
     }
     
     private void drawHud() {
@@ -63,39 +60,6 @@ public class Referee extends AbstractReferee {
         }
     }
     
-    private void drawEndScreen() {
-        endScreenGroup = graphicEntityModule.createGroup().setZIndex(100).setVisible(false);
-        
-        endScreenGroup.add(graphicEntityModule.createRectangle()
-            .setWidth(1920).setHeight(1080)
-            .setFillColor(0x000000).setAlpha(0.85));
-            
-        endScreenGroup.add(graphicEntityModule.createText("FINAL SCORE")
-            .setX(1920/2).setY(200).setAnchorX(0.5)
-            .setFontSize(80).setFillColor(0xFFD700)
-            .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD));
-            
-        for (Player player : gameManager.getPlayers()) {
-            int x = player.getIndex() == 0 ? 1920/2 - 400 : 1920/2 + 400;
-            int y = 500;
-            
-            endScreenGroup.add(graphicEntityModule.createSprite()
-                .setImage(player.getAvatarToken())
-                .setX(x).setY(y - 150).setAnchorX(0.5).setAnchorY(0.5)
-                .setBaseWidth(200).setBaseHeight(200));
-                
-            endScreenGroup.add(graphicEntityModule.createText(player.getNicknameToken())
-                .setX(x).setY(y + 80).setAnchorX(0.5)
-                .setFontSize(50).setFillColor(0xFFFFFF));
-                
-            finalScoreTexts[player.getIndex()] = graphicEntityModule.createText("SCORE: 0")
-                .setX(x).setY(y + 160).setAnchorX(0.5)
-                .setFontSize(60).setFillColor(0xFFD700)
-                .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD);
-                
-            endScreenGroup.add(finalScoreTexts[player.getIndex()]);
-        }
-    }
 
     private void drawBoard() {
         graphicEntityModule.createSprite()
@@ -181,7 +145,7 @@ public class Referee extends AbstractReferee {
             Move move = parseMove(output);
             
             if (move == null) {
-                throw new InvalidActionException("Invalid move format. Expected: MOVE x1 y1 x2 y2");
+                throw new InvalidActionException("Invalid move format. Expected: x1 y1 x2 y2");
             }
             
             applyMove(playerIdx, move);
@@ -198,12 +162,12 @@ public class Referee extends AbstractReferee {
             checkWinCondition();
 
         } catch (TimeoutException e) {
-            gameManager.addTooltip(player, player.getNicknameToken() + " timeout!");
+            gameManager.addToGameSummary(player.getNicknameToken() + " timeout!");
             player.setScore(-1);
             player.deactivate("Timeout!");
             endGame(1 - playerIdx);
         } catch (InvalidActionException e) {
-            gameManager.addTooltip(player, player.getNicknameToken() + " made an invalid action: " + e.getMessage());
+            gameManager.addToGameSummary(player.getNicknameToken() + " made an invalid action: " + e.getMessage());
             player.setScore(-1);
             player.deactivate(e.getMessage());
             endGame(1 - playerIdx);
@@ -228,7 +192,7 @@ public class Referee extends AbstractReferee {
     }
     
     private Move parseMove(String output) throws InvalidActionException {
-        Pattern p = Pattern.compile("^MOVE (\\d+) (\\d+) (\\d+) (\\d+)$");
+        Pattern p = Pattern.compile("^\\s*(?:MOVE\\s+)?(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)\\s*$");
         Matcher m = p.matcher(output);
         if (m.find()) {
             int x1 = Integer.parseInt(m.group(1));
@@ -246,7 +210,11 @@ public class Referee extends AbstractReferee {
         
         boolean isAttacker = p.getType() == PieceType.ATTACKER;
         if ((playerIdx == 0 && !isAttacker) || (playerIdx == 1 && isAttacker)) {
-            throw new InvalidActionException("Not your piece");
+            throw new InvalidActionException("Piece does not belong to the current player");
+        }
+        
+        if (move.startX == move.endX && move.startY == move.endY) {
+            throw new InvalidActionException("Start is the same as destination");
         }
         
         if (move.endX < 0 || move.endX >= Board.SIZE || move.endY < 0 || move.endY >= Board.SIZE) {
@@ -258,11 +226,7 @@ public class Referee extends AbstractReferee {
         }
         
         if (move.startX != move.endX && move.startY != move.endY) {
-            throw new InvalidActionException("Move must be orthogonal");
-        }
-        
-        if (move.startX == move.endX && move.startY == move.endY) {
-            throw new InvalidActionException("Move must not be empty");
+            throw new InvalidActionException("Move is not orthogonal");
         }
         
         if (move.startX == move.endX) {
@@ -446,7 +410,7 @@ public class Referee extends AbstractReferee {
             gameManager.addTooltip(gameManager.getPlayer(1), "The King escaped!");
             endGame(1);
         } else if (checkEncirclement()) {
-            gameManager.addTooltip(gameManager.getPlayer(0), "Attackers encircled the defenders!");
+            gameManager.addTooltip(gameManager.getPlayer(0), "Attackers encircled the Defenders!");
             endGame(0);
         }
     }
@@ -456,16 +420,11 @@ public class Referee extends AbstractReferee {
         Player loser = gameManager.getPlayer(1 - winnerIdx);
         
         if (winner.getScore() != -1) {
-            winner.setScore(1000 - currentTurn);
+            winner.setScore(1);
         }
         if (loser.getScore() != -1) {
             loser.setScore(0);
         }
-        
-        finalScoreTexts[winner.getIndex()].setText("SCORE: " + winner.getScore());
-        finalScoreTexts[loser.getIndex()].setText("SCORE: " + loser.getScore());
-        
-        endScreenGroup.setVisible(true);
         
         gameManager.endGame();
     }

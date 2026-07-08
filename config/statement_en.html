@@ -35,17 +35,17 @@
         <ul>
           <li>The official rules use the terms "black" and "white" instead of "Attackers" and "Defenders".</li>
           <li>Point 10 (a full game is played in two sets) is irrelevant. Every CodinGame match is a single game.</li>
-          <li>The concepts of a turn limit and score don't exist in the official rules but are used here to prevent infinite games.</li>
+          <li>The concept of a turn limit doesn't exist in the official rules but is used here to prevent infinite games.</li>
         </ul>
         <br>
-        <p><strong>Board & Coordinates:</strong> The game is played on a 7x7 grid. The initial board state is provided to your program during the first turn's input. The coordinate system starts at (0, 0) in the top-left corner. The x-coordinate increases to the right, and the y-coordinate increases downwards.</p>
-        <p><strong>Movement:</strong> All pieces move orthogonally (like a rook in chess) any number of empty squares. Pieces cannot jump over other pieces.</p>
+        <p><strong>Board & Coordinates:</strong> The game is played on a 7x7 board. Every game starts from the standard opening position as described in the official rules. The coordinate system starts at (0, 0) in the top-left corner. The x-coordinate increases to the right, and the y-coordinate increases downwards.</p>
+        <p><strong>Movement:</strong> The Attackers always move first. All pieces move orthogonally (like a rook in chess) any number of empty squares. Pieces cannot jump over other pieces.</p>
         <p><strong>The Throne and Corners:</strong> The center square (3,3) is the Throne. The 4 corner squares are the escape zones. Only the King can stop on the Throne or the corners. Other pieces can pass <em>over</em> the Throne if it is empty, but cannot land on it.</p>
         <p><strong>Hostile Pieces:</strong> The opponent's pieces are considered hostile pieces. The Throne and the corners <em>also</em> act as hostile pieces for the purpose of capturing.</p>
-        <p><strong>The Throne's Hostility:</strong> The Throne is <strong>always</strong> hostile to Attackers. However, it is only hostile to Defenders if the King is <strong>not</strong> currently standing on it.</p>
+        <p><strong>The Throne's Hostility:</strong> The Throne is <strong>always</strong> hostile to Attackers. However, it is only hostile to Defenders if the King is <strong>not</strong> currently standing on it. The Throne is never hostile to the King.</p>
         <p><strong>Capturing:</strong> A piece (attacker or defender) is captured if it is flanked on two opposite sides by hostile pieces.</p>
-        <p><strong>Capturing the King:</strong> The King is captured like any other piece, <em>except</em> when he is on the Throne or immediately adjacent to it. If the King is on the Throne, he must be surrounded on all 4 sides to be captured. If he is adjacent to the Throne, he must be surrounded on the 3 remaining sides.</p>
-        <p><strong>Game End & Score:</strong> The game ends immediately when a victory or defeat condition is met. The winner receives a score of <code>1000 - current_turn</code>, while the loser receives <code>0</code>. If neither side wins after <strong>200 turns</strong> (100 rounds), a draw is declared and both players receive a score of <code>0</code>.</p>
+        <p><strong>Capturing the King:</strong> The King is captured like any other piece, <em>except</em> when he is on the Throne. If the King is on the Throne, he must be surrounded on all 4 sides to be captured.</p>
+        <p><strong>Game End:</strong> The game ends immediately when a victory or defeat condition is met. If neither side wins after <strong>200 turns</strong> (100 rounds), a draw is declared.</p>
         <p><strong>Source Code:</strong> The source code for this game (Referee) is available on <a href="https://github.com/n3l-ctrl/brandubh-codingame/blob/master/src/main/java/com/codingame/game/Referee.java" target="_blank">GitHub</a>.</p>
       </div>
     </div>
@@ -58,8 +58,8 @@
           <div class="title">Victory Conditions</div>
           <div class="text">
               <ul style="padding-bottom: 0;">
-                  <li><strong>Defenders:</strong> The King reaches one of the 4 corner squares.</li>
                   <li><strong>Attackers:</strong> The King is captured, or all remaining defenders are encircled and cannot move.</li>
+                  <li><strong>Defenders:</strong> The King reaches one of the 4 corner squares.</li>
               </ul>
           </div>
       </div>
@@ -107,13 +107,13 @@
     <div class="blk">
       <div class="title">Output</div>
       <div class="text">
-        <span class="statement-lineno">A single line</span> containing your move in the format: <action>MOVE</action> <var>x1</var> <var>y1</var> <var>x2</var> <var>y2</var>. 
+        <span class="statement-lineno">A single line</span> containing your move in the format: <var>x1</var> <var>y1</var> <var>x2</var> <var>y2</var>. 
         <br>
         <ul>
             <li><var>x1</var>, <var>y1</var>: The starting coordinates of the piece you want to move.</li>
             <li><var>x2</var>, <var>y2</var>: The destination coordinates for that piece.</li>
         </ul>
-        For example: <const>MOVE 3 1 3 0</const> to move the piece from (3,1) to (3,0).
+        For example: <const>3 1 3 0</const> to move the piece from (3,1) to (3,0).
         <br>
       </div>
     </div>
