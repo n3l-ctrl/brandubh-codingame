@@ -380,7 +380,7 @@ int main() {
             int sy = m.start / 7;
             int ex = m.end % 7;
             int ey = m.end / 7;
-            cout << "MOVE " << sx << " " << sy << " " << ex << " " << ey << endl;
+            cout << sx << " " << sy << " " << ex << " " << ey << endl;
         } else {
             cout << "WAIT" << endl;
         }

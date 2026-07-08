@@ -348,6 +348,6 @@ while True:
         sy = move[0] // 7
         ex = move[1] % 7
         ey = move[1] // 7
-        print(f"MOVE {sx} {sy} {ex} {ey}", flush=True)
+        print(f"{sx} {sy} {ex} {ey}", flush=True)
     else:
         print("WAIT", flush=True)
