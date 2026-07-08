@@ -1,0 +1,129 @@
+<div id="statement_back" class="statement_back" style="display:none"></div>
+<div class="statement-body">
+  <!-- STORY -->
+  <div class="statement-story-background">
+    <div class="statement-story-cover" style="background-size: cover; background-image: url(https://www.codingame.com/servlet/fileservlet?id=2210505809934)">
+      <div class="statement-story">
+        <h1>Brandubh</h1>
+        <div class="story-text">Un ancien jeu de stratégie celtique. Un petit groupe de défenseurs doit aider son Roi à s'enfuir, tandis qu'une large force d'attaquants tente de le capturer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOAL -->
+  <div class="statement-section statement-goal">
+    <h1>
+      <span class="icon icon-goal">&nbsp;</span>
+      <span>L'Objectif</span>
+    </h1>
+    <div class="statement-goal-content">
+      Incarnez soit les <strong>Attaquants</strong> soit les <strong>Défenseurs</strong> dans une partie de Brandubh (une variante du Hnefatafl). Vous devez remplir vos conditions de victoire avant votre adversaire.
+      <br><br>
+      <em>Note : Les Défenseurs contrôlent le Roi ainsi que les pièces de défense standard.</em>
+    </div>
+  </div>
+
+  <!-- RULES -->
+  <div class="statement-section statement-rules">
+    <h1>
+      <span class="icon icon-rules">&nbsp;</span>
+      <span>Les Règles</span>
+    </h1>
+    <div>
+      <div class="statement-rules-content">
+        <p><em>Pour tous les détails, vous pouvez consulter les <a href="https://aagenielsen.dk/brandubh2_rules_fr.pdf" target="_blank">règles officielles au format PDF</a>. Notez cependant ces quelques différences avec l'adaptation CodinGame :</em></p>
+        <ul>
+          <li>Les règles officielles parlent de pièces "Noires" et "Blanches" au lieu "d'Attaquants" et de "Défenseurs".</li>
+          <li>Le point 10 (une partie complète se joue en deux manches) n'est pas applicable. Chaque match sur CodinGame consiste en une seule manche.</li>
+          <li>Les concepts de limite de tours et de score n'existent pas dans les règles officielles, mais sont utilisés ici pour éviter les parties infinies.</li>
+        </ul>
+        <br>
+        <p><strong>Plateau et Coordonnées :</strong> Le jeu se déroule sur une grille de 7x7 cases. L'état initial du plateau est fourni à votre programme lors des entrées du tout premier tour. Le système de coordonnées commence à (0, 0) dans le coin supérieur gauche. L'axe X s'étend vers la droite, et l'axe Y vers le bas.</p>
+        <p><strong>Déplacements :</strong> Toutes les pièces se déplacent de façon orthogonale (comme la tour aux échecs) d'autant de cases vides qu'elles le souhaitent. Les pièces ne peuvent pas sauter par-dessus d'autres pièces.</p>
+        <p><strong>Le Trône et les Coins :</strong> La case centrale (3,3) est le Trône. Les 4 cases dans les coins sont les zones d'évasion. Seul le Roi peut s'arrêter sur le Trône ou dans les coins. Les autres pièces peuvent passer <em>au-dessus</em> du Trône s'il est vide, mais ne peuvent pas s'y arrêter.</p>
+        <p><strong>Pièces Hostiles :</strong> Les pièces de l'adversaire sont considérées comme des pièces hostiles. Le Trône et les quatre coins du plateau agissent <em>également</em> comme des pièces hostiles pour faciliter les captures.</p>
+        <p><strong>L'Hostilité du Trône :</strong> Le Trône est <strong>toujours</strong> hostile pour les Attaquants. Cependant, il n'est hostile pour les Défenseurs que si le Roi ne se trouve <strong>pas</strong> dessus.</p>
+        <p><strong>Capture classique :</strong> Une pièce (attaquant ou défenseur) est capturée si elle est prise en tenaille sur deux côtés opposés par deux pièces hostiles.</p>
+        <p><strong>Capture du Roi :</strong> Le Roi est capturé comme n'importe quelle autre pièce, <em>sauf</em> lorsqu'il est sur le Trône ou immédiatement adjacent à celui-ci. S'il est sur le Trône, il doit être entouré sur les 4 côtés pour être capturé. S'il est adjacent au Trône, il doit être entouré sur les 3 côtés restants.</p>
+        <p><strong>Fin de Partie et Score :</strong> La partie se termine immédiatement lorsqu'une condition de victoire ou de défaite est atteinte. Le gagnant reçoit un score de <code>1000 - tour_actuel</code>, tandis que le perdant reçoit <code>0</code>. Si aucun camp ne gagne après <strong>200 tours</strong> (100 manches pour chaque joueur), un match nul est déclaré et les deux joueurs reçoivent un score de <code>0</code>.</p>
+        <p><strong>Code Source :</strong> Le code source de ce jeu est public et disponible sur <a href="https://gitlab.com/n3l-group/n3l-project" target="_blank">GitLab</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VICTORY CONDITIONS -->
+  <div class="statement-victory-conditions">
+      <div class="icon victory"></div>
+      <div class="blk">
+          <div class="title">Conditions de Victoire</div>
+          <div class="text">
+              <ul style="padding-bottom: 0;">
+                  <li><strong>Défenseurs :</strong> Le Roi atteint l'une des 4 cases de coin.</li>
+                  <li><strong>Attaquants :</strong> Le Roi est capturé, ou tous les défenseurs restants sont encerclés et ne peuvent plus bouger.</li>
+              </ul>
+          </div>
+      </div>
+  </div>
+
+  <!-- LOSE CONDITIONS -->
+  <div class="statement-lose-conditions">
+      <div class="icon lose"></div>
+      <div class="blk">
+          <div class="title">Conditions de Défaite</div>
+          <div class="text">
+              <ul style="padding-bottom: 0;">
+                  <li>Vous n'avez plus aucun mouvement valide possible.</li>
+                  <li>Vous répétez la même position exacte du plateau 3 fois (règle des 3 répétitions).</li>
+                  <li>Votre programme fournit une action invalide.</li>
+                  <li>Votre programme dépasse la limite de temps.</li>
+              </ul>
+          </div>
+      </div>
+  </div>
+
+
+  <!-- PROTOCOL -->
+  <div class="statement-section statement-protocol">
+    <h1>
+      <span class="icon icon-protocol">&nbsp;</span>
+      <span>Entrées du Jeu</span>
+    </h1>
+    <!-- Protocol block -->
+    <div class="blk">
+      <div class="title">Entrées pour un tour de jeu</div>
+      <div class="text">
+        <p><span class="statement-lineno">Ligne 1 : </span><var>role</var> - un entier représentant votre rôle (<const>0</const> pour les Attaquants, <const>1</const> pour les Défenseurs).</p>
+        <p><span class="statement-lineno">Les 7 lignes suivantes :</span> Une chaîne de <const>7</const> caractères représentant l'état du plateau. Les caractères peuvent être :</p>
+        <ul>
+          <li><const>.</const> : Case vide</li>
+          <li><const>A</const> : Attaquant</li>
+          <li><const>D</const> : Défenseur</li>
+          <li><const>K</const> : Le Roi</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Protocol block -->
+    <div class="blk">
+      <div class="title">Sortie</div>
+      <div class="text">
+        <span class="statement-lineno">Une seule ligne</span> contenant votre mouvement au format : <action>MOVE</action> <var>x1</var> <var>y1</var> <var>x2</var> <var>y2</var>.
+        <br>
+        <ul>
+            <li><var>x1</var>, <var>y1</var> : Les coordonnées de départ de la pièce que vous souhaitez déplacer.</li>
+            <li><var>x2</var>, <var>y2</var> : Les coordonnées d'arrivée de cette pièce.</li>
+        </ul>
+        Par exemple : <const>MOVE 3 1 3 0</const> pour déplacer la pièce de la case (3,1) vers la case (3,0).
+        <br>
+      </div>
+    </div>
+
+    <!-- Protocol block -->
+    <div class="blk">
+      <div class="title">Contraintes</div>
+      <div class="text">
+        Temps de réponse maximum alloué :
+        ≤ <const>100</const> ms pour le tout premier tour, et ≤ <const>50</const> ms pour les tours suivants.</div>
+    </div>
+  </div>
+</div>

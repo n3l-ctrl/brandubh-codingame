@@ -1,5 +1,8 @@
 package com.codingame.game;
+
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.codingame.gameengine.core.AbstractPlayer.TimeoutException;
 import com.codingame.gameengine.core.AbstractReferee;
@@ -8,30 +11,462 @@ import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.google.inject.Inject;
 
 public class Referee extends AbstractReferee {
-    // Uncomment the line below and comment the line under it to create a Solo Game
-    // @Inject private SoloGameManager<Player> gameManager;
     @Inject private MultiplayerGameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
+    
+    private Board board;
+    private java.util.Map<Piece, com.codingame.gameengine.module.entities.Sprite> pieceEntities = new java.util.HashMap<>();
+    private com.codingame.gameengine.module.entities.Group endScreenGroup;
+    private com.codingame.gameengine.module.entities.Text[] finalScoreTexts = new com.codingame.gameengine.module.entities.Text[2];
+    private static final int CELL_SIZE = 126;
+    private static final int OFFSET_X = 1920 / 2 - (Board.SIZE * CELL_SIZE) / 2;
+    private static final int OFFSET_Y = 1080 / 2 - (Board.SIZE * CELL_SIZE) / 2;
 
     @Override
     public void init() {
-        // Initialize your game here.
+        board = new Board();
+        gameManager.setTurnMaxTime(100);
+        gameManager.setMaxTurns(200);
+        drawBoard();
+        drawHud();
+        drawEndScreen();
     }
+    
+    private void drawHud() {
+        for (Player player : gameManager.getPlayers()) {
+            int x = player.getIndex() == 0 ? 100 : 1920 - 400;
+            int y = 100;
+            
+            graphicEntityModule.createRectangle()
+                .setX(x - 20).setY(y - 20)
+                .setWidth(340).setHeight(140)
+                .setFillColor(0x222222)
+                .setLineColor(0x8B4513)
+                .setLineWidth(4)
+                .setAlpha(0.8);
+                
+            graphicEntityModule.createSprite()
+                .setImage(player.getAvatarToken())
+                .setX(x).setY(y)
+                .setBaseWidth(100).setBaseHeight(100);
+                
+            graphicEntityModule.createText(player.getNicknameToken())
+                .setX(x + 120).setY(y + 20)
+                .setFontSize(40)
+                .setFillColor(0xFFFFFF)
+                .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD);
+                
+            graphicEntityModule.createText(player.getIndex() == 0 ? "ATTACKERS" : "DEFENDERS")
+                .setX(x + 120).setY(y + 70)
+                .setFontSize(25)
+                .setFillColor(0xAAAAAA);
+        }
+    }
+    
+    private void drawEndScreen() {
+        endScreenGroup = graphicEntityModule.createGroup().setZIndex(100).setVisible(false);
+        
+        endScreenGroup.add(graphicEntityModule.createRectangle()
+            .setWidth(1920).setHeight(1080)
+            .setFillColor(0x000000).setAlpha(0.85));
+            
+        endScreenGroup.add(graphicEntityModule.createText("FINAL SCORE")
+            .setX(1920/2).setY(200).setAnchorX(0.5)
+            .setFontSize(80).setFillColor(0xFFD700)
+            .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD));
+            
+        for (Player player : gameManager.getPlayers()) {
+            int x = player.getIndex() == 0 ? 1920/2 - 400 : 1920/2 + 400;
+            int y = 500;
+            
+            endScreenGroup.add(graphicEntityModule.createSprite()
+                .setImage(player.getAvatarToken())
+                .setX(x).setY(y - 150).setAnchorX(0.5).setAnchorY(0.5)
+                .setBaseWidth(200).setBaseHeight(200));
+                
+            endScreenGroup.add(graphicEntityModule.createText(player.getNicknameToken())
+                .setX(x).setY(y + 80).setAnchorX(0.5)
+                .setFontSize(50).setFillColor(0xFFFFFF));
+                
+            finalScoreTexts[player.getIndex()] = graphicEntityModule.createText("SCORE: 0")
+                .setX(x).setY(y + 160).setAnchorX(0.5)
+                .setFontSize(60).setFillColor(0xFFD700)
+                .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD);
+                
+            endScreenGroup.add(finalScoreTexts[player.getIndex()]);
+        }
+    }
+
+    private void drawBoard() {
+        graphicEntityModule.createSprite()
+            .setImage("board.png")
+            .setX(1920 / 2)
+            .setY(1080 / 2)
+            .setAnchorX(0.5)
+            .setAnchorY(0.5)
+            .setBaseWidth(1000)
+            .setBaseHeight(1000)
+            .setZIndex(-1);
+
+        for (int x = 0; x < Board.SIZE; x++) {
+            for (int y = 0; y < Board.SIZE; y++) {
+                int color = 0x000000;
+                double alpha = 0.0;
+                
+                if (alpha > 0) {
+                    graphicEntityModule.createRectangle()
+                        .setX(OFFSET_X + x * CELL_SIZE)
+                        .setY(OFFSET_Y + y * CELL_SIZE)
+                        .setWidth(CELL_SIZE)
+                        .setHeight(CELL_SIZE)
+                        .setFillColor(color)
+                        .setAlpha(alpha);
+                }
+            }
+        }
+        
+        for (Piece p : board.getPieces()) {
+            String image = "attacker.png";
+            if (p.getType() == PieceType.DEFENDER) image = "defender.png";
+            else if (p.getType() == PieceType.KING) image = "king.png";
+            
+            com.codingame.gameengine.module.entities.Sprite s = graphicEntityModule.createSprite()
+                .setImage(image)
+                .setBaseWidth(CELL_SIZE - 20)
+                .setBaseHeight(CELL_SIZE - 20)
+                .setX(OFFSET_X + p.getX() * CELL_SIZE + 10)
+                .setY(OFFSET_Y + p.getY() * CELL_SIZE + 10)
+                .setZIndex(10);
+            
+            pieceEntities.put(p, s);
+        }
+    }
+
+    private java.util.Map<String, Integer> stateHistory = new java.util.HashMap<>();
+
+    private String getBoardStateHash(int currentPlayerIdx) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(currentPlayerIdx).append(";");
+        for (int y = 0; y < Board.SIZE; y++) {
+            for (int x = 0; x < Board.SIZE; x++) {
+                Piece p = board.getPiece(x, y);
+                if (p != null) sb.append(p.getType().name().charAt(0));
+                else sb.append(".");
+            }
+        }
+        return sb.toString();
+    }
+
+    private int currentTurn;
 
     @Override
     public void gameTurn(int turn) {
-        for (Player player : gameManager.getActivePlayers()) {
-            player.sendInputLine("input");
-            player.execute();
+        this.currentTurn = turn;
+        int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
+        Player player = gameManager.getPlayer(playerIdx);
+        
+        if (!hasValidMoves(playerIdx)) {
+            gameManager.addTooltip(player, player.getNicknameToken() + " has no valid moves!");
+            player.deactivate("No valid moves!");
+            endGame(1 - playerIdx);
+            return;
         }
+        
+        sendInputs(player);
+        player.execute();
 
-        for (Player player : gameManager.getActivePlayers()) {
-            try {
-                List<String> outputs = player.getOutputs();
-                // Check validity of the player output and compute the new game state
-            } catch (TimeoutException e) {
-                player.deactivate(String.format("$%d timeout!", player.getIndex()));
+        try {
+            List<String> outputs = player.getOutputs();
+            String output = outputs.get(0).trim();
+            Move move = parseMove(output);
+            
+            if (move == null) {
+                throw new InvalidActionException("Invalid move format. Expected: MOVE x1 y1 x2 y2");
             }
-        }        
+            
+            applyMove(playerIdx, move);
+            checkCaptures(move);
+            
+            String state = getBoardStateHash(1 - playerIdx);
+            stateHistory.put(state, stateHistory.getOrDefault(state, 0) + 1);
+            if (stateHistory.get(state) >= 3) {
+                gameManager.addTooltip(player, "Repeated position 3 times! " + player.getNicknameToken() + " loses!");
+                endGame(1 - playerIdx);
+                return;
+            }
+            
+            checkWinCondition();
+
+        } catch (TimeoutException e) {
+            gameManager.addTooltip(player, player.getNicknameToken() + " timeout!");
+            player.setScore(-1);
+            player.deactivate("Timeout!");
+            endGame(1 - playerIdx);
+        } catch (InvalidActionException e) {
+            gameManager.addTooltip(player, player.getNicknameToken() + " made an invalid action: " + e.getMessage());
+            player.setScore(-1);
+            player.deactivate(e.getMessage());
+            endGame(1 - playerIdx);
+        }
+    }
+    
+    private void sendInputs(Player player) {
+        int playerIdx = player.getIndex(); // 0 for Attackers, 1 for Defenders
+        player.sendInputLine(String.valueOf(playerIdx));
+        
+        for (int y = 0; y < Board.SIZE; y++) {
+            StringBuilder sb = new StringBuilder();
+            for (int x = 0; x < Board.SIZE; x++) {
+                Piece p = board.getPiece(x, y);
+                if (p == null) sb.append(".");
+                else if (p.getType() == PieceType.ATTACKER) sb.append("A");
+                else if (p.getType() == PieceType.DEFENDER) sb.append("D");
+                else if (p.getType() == PieceType.KING) sb.append("K");
+            }
+            player.sendInputLine(sb.toString());
+        }
+    }
+    
+    private Move parseMove(String output) throws InvalidActionException {
+        Pattern p = Pattern.compile("^MOVE (\\d+) (\\d+) (\\d+) (\\d+)$");
+        Matcher m = p.matcher(output);
+        if (m.find()) {
+            int x1 = Integer.parseInt(m.group(1));
+            int y1 = Integer.parseInt(m.group(2));
+            int x2 = Integer.parseInt(m.group(3));
+            int y2 = Integer.parseInt(m.group(4));
+            return new Move(x1, y1, x2, y2);
+        }
+        return null;
+    }
+    
+    private void applyMove(int playerIdx, Move move) throws InvalidActionException {
+        Piece p = board.getPiece(move.startX, move.startY);
+        if (p == null) throw new InvalidActionException("No piece at start position");
+        
+        boolean isAttacker = p.getType() == PieceType.ATTACKER;
+        if ((playerIdx == 0 && !isAttacker) || (playerIdx == 1 && isAttacker)) {
+            throw new InvalidActionException("Not your piece");
+        }
+        
+        if (move.endX < 0 || move.endX >= Board.SIZE || move.endY < 0 || move.endY >= Board.SIZE) {
+            throw new InvalidActionException("Destination out of bounds");
+        }
+        
+        if (board.getPiece(move.endX, move.endY) != null) {
+            throw new InvalidActionException("Destination is occupied");
+        }
+        
+        if (move.startX != move.endX && move.startY != move.endY) {
+            throw new InvalidActionException("Move must be orthogonal");
+        }
+        
+        if (move.startX == move.endX && move.startY == move.endY) {
+            throw new InvalidActionException("Move must not be empty");
+        }
+        
+        if (move.startX == move.endX) {
+            int min = Math.min(move.startY, move.endY);
+            int max = Math.max(move.startY, move.endY);
+            for (int y = min + 1; y < max; y++) {
+                if (board.getPiece(move.startX, y) != null) throw new InvalidActionException("Path is blocked");
+            }
+        } else {
+            int min = Math.min(move.startX, move.endX);
+            int max = Math.max(move.startX, move.endX);
+            for (int x = min + 1; x < max; x++) {
+                if (board.getPiece(x, move.startY) != null) throw new InvalidActionException("Path is blocked");
+            }
+        }
+        
+        if (board.isThrone(move.endX, move.endY) || board.isCorner(move.endX, move.endY)) {
+            if (p.getType() != PieceType.KING) {
+                throw new InvalidActionException("Only the King can move to the Throne or Corners");
+            }
+        }
+        
+        board.movePiece(p, move.endX, move.endY);
+        com.codingame.gameengine.module.entities.Sprite s = pieceEntities.get(p);
+        if (s != null) {
+            s.setX(OFFSET_X + move.endX * CELL_SIZE + 10);
+            s.setY(OFFSET_Y + move.endY * CELL_SIZE + 10);
+        }
+    }
+    
+    private void checkCaptures(Move move) {
+        Piece moved = board.getPiece(move.endX, move.endY);
+        if (moved == null) return;
+        
+        int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+        for (int[] d : dirs) {
+            int adjX = move.endX + d[0];
+            int adjY = move.endY + d[1];
+            Piece adj = board.getPiece(adjX, adjY);
+            
+            if (adj != null && isEnemy(moved, adj)) {
+                if (adj.getType() == PieceType.KING && adj.getX() == 3 && adj.getY() == 3) {
+                    if (isKingCaptured(adj)) {
+                        board.removePiece(adj);
+                        com.codingame.gameengine.module.entities.Sprite s = pieceEntities.get(adj);
+                        if (s != null) s.setVisible(false);
+                    }
+                } else {
+                    int oppX = adjX + d[0];
+                    int oppY = adjY + d[1];
+                    boolean capturingKing = adj.getType() == PieceType.KING;
+                    if (isHostileSquare(oppX, oppY, moved.getType(), capturingKing)) {
+                        board.removePiece(adj);
+                        com.codingame.gameengine.module.entities.Sprite s = pieceEntities.get(adj);
+                        if (s != null) s.setVisible(false);
+                    }
+                }
+            }
+        }
+    }
+    
+    private boolean isEnemy(Piece p1, Piece p2) {
+        if (p1.getType() == PieceType.ATTACKER) return p2.getType() != PieceType.ATTACKER;
+        return p2.getType() == PieceType.ATTACKER;
+    }
+    
+    private boolean isHostileSquare(int x, int y, PieceType capturingType, boolean capturingKing) {
+        if (x < 0 || x >= Board.SIZE || y < 0 || y >= Board.SIZE) return false;
+        
+        if (board.isCorner(x, y)) return true;
+        
+        if (board.isThrone(x, y)) {
+            if (capturingKing) return false;
+            if (capturingType == PieceType.ATTACKER) return true;
+            if (capturingType == PieceType.DEFENDER) {
+                return board.getPiece(3, 3) == null; // only hostile to defenders if King is not on it
+            }
+        }
+        
+        Piece p = board.getPiece(x, y);
+        if (p != null) {
+            if (capturingType == PieceType.ATTACKER) return p.getType() == PieceType.ATTACKER;
+            return p.getType() != PieceType.ATTACKER;
+        }
+        return false;
+    }
+    
+    private boolean isKingCaptured(Piece king) {
+        // This is only called when King is on the throne
+        int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+        for (int[] d : dirs) {
+            int x = king.getX() + d[0];
+            int y = king.getY() + d[1];
+            if (!isHostileSquare(x, y, PieceType.ATTACKER, true)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private boolean hasValidMoves(int playerIdx) {
+        boolean isAttacker = playerIdx == 0;
+        for (Piece p : board.getPieces()) {
+            if ((p.getType() == PieceType.ATTACKER) == isAttacker) {
+                int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+                for (int[] d : dirs) {
+                    int nx = p.getX() + d[0];
+                    int ny = p.getY() + d[1];
+                    if (nx >= 0 && nx < Board.SIZE && ny >= 0 && ny < Board.SIZE) {
+                        if (board.getPiece(nx, ny) == null) {
+                            if (board.isThrone(nx, ny) || board.isCorner(nx, ny)) {
+                                if (p.getType() == PieceType.KING) return true;
+                            } else {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkEncirclement() {
+        boolean[][] visited = new boolean[Board.SIZE][Board.SIZE];
+        java.util.Queue<int[]> queue = new java.util.LinkedList<>();
+        
+        for (int x = 0; x < Board.SIZE; x++) {
+            for (int y = 0; y < Board.SIZE; y++) {
+                if (x == 0 || x == Board.SIZE - 1 || y == 0 || y == Board.SIZE - 1) {
+                    Piece p = board.getPiece(x, y);
+                    if (p != null) {
+                        if (p.getType() == PieceType.KING || p.getType() == PieceType.DEFENDER) {
+                            return false; 
+                        }
+                    }
+                    if (p == null || p.getType() != PieceType.ATTACKER) {
+                        queue.add(new int[]{x, y});
+                        visited[x][y] = true;
+                    }
+                }
+            }
+        }
+        
+        int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+        while (!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            int cx = curr[0];
+            int cy = curr[1];
+            
+            Piece p = board.getPiece(cx, cy);
+            if (p != null && (p.getType() == PieceType.KING || p.getType() == PieceType.DEFENDER)) {
+                return false; 
+            }
+            
+            for (int[] d : dirs) {
+                int nx = cx + d[0];
+                int ny = cy + d[1];
+                if (nx >= 0 && nx < Board.SIZE && ny >= 0 && ny < Board.SIZE && !visited[nx][ny]) {
+                    Piece np = board.getPiece(nx, ny);
+                    if (np == null || np.getType() != PieceType.ATTACKER) {
+                        visited[nx][ny] = true;
+                        queue.add(new int[]{nx, ny});
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
+    private void checkWinCondition() {
+        Piece king = null;
+        for (Piece p : board.getPieces()) {
+            if (p.getType() == PieceType.KING) king = p;
+        }
+        
+        if (king == null) {
+            gameManager.addTooltip(gameManager.getPlayer(0), "Attackers captured the King!");
+            endGame(0);
+        } else if (board.isCorner(king.getX(), king.getY())) {
+            gameManager.addTooltip(gameManager.getPlayer(1), "The King escaped!");
+            endGame(1);
+        } else if (checkEncirclement()) {
+            gameManager.addTooltip(gameManager.getPlayer(0), "Attackers encircled the defenders!");
+            endGame(0);
+        }
+    }
+    
+    private void endGame(int winnerIdx) {
+        Player winner = gameManager.getPlayer(winnerIdx);
+        Player loser = gameManager.getPlayer(1 - winnerIdx);
+        
+        if (winner.getScore() != -1) {
+            winner.setScore(1000 - currentTurn);
+        }
+        if (loser.getScore() != -1) {
+            loser.setScore(0);
+        }
+        
+        finalScoreTexts[winner.getIndex()].setText("SCORE: " + winner.getScore());
+        finalScoreTexts[loser.getIndex()].setText("SCORE: " + loser.getScore());
+        
+        endScreenGroup.setVisible(true);
+        
+        gameManager.endGame();
     }
 }
