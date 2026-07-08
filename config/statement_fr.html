@@ -38,7 +38,7 @@
           <li>Le concept de limite de tours n'existe pas dans les règles officielles, mais est utilisé ici pour éviter les parties infinies.</li>
         </ul>
         <br>
-        <p><strong>Plateau et Coordonnées :</strong> Le jeu se déroule sur un plateau de 7x7 cases. Chaque partie commence depuis la position standard initiale telle que décrite dans les règles officielles. Le système de coordonnées commence à (0, 0) dans le coin supérieur gauche. L'axe X s'étend vers la droite, et l'axe Y vers le bas.</p>
+        <p><strong>Plateau et Coordonnées :</strong> Le jeu se déroule sur un plateau de 7x7. Chaque partie commence dans la position de départ standard décrite dans les règles officielles. Le plateau utilise la notation classique des échecs, où les colonnes vont de `a` à `g` (de gauche à droite) et les lignes de `1` à `7` (de bas en haut). La case en bas à gauche est donc `a1`.</p>
         <p><strong>Déplacements :</strong> Les Attaquants jouent toujours en premier. Toutes les pièces se déplacent de façon orthogonale (comme la tour aux échecs) d'autant de cases vides qu'elles le souhaitent. Les pièces ne peuvent pas sauter par-dessus d'autres pièces.</p>
         <p><strong>Le Trône et les Coins :</strong> La case centrale (3,3) est le Trône. Les 4 cases dans les coins sont les zones d'évasion. Seul le Roi peut s'arrêter sur le Trône ou dans les coins. Les autres pièces peuvent passer <em>au-dessus</em> du Trône s'il est vide, mais ne peuvent pas s'y arrêter.</p>
         <p><strong>Pièces Hostiles :</strong> Les pièces de l'adversaire sont considérées comme des pièces hostiles. Le Trône et les quatre coins du plateau agissent <em>également</em> comme des pièces hostiles pour faciliter les captures.</p>
@@ -93,11 +93,12 @@
       <div class="title">Entrées pour un tour de jeu</div>
       <div class="text">
         <p><span class="statement-lineno">Ligne 1 : </span><var>role</var> - un entier représentant votre rôle (<const>0</const> pour les Attaquants, <const>1</const> pour les Défenseurs).</p>
-        <p><span class="statement-lineno">Les 7 lignes suivantes :</span> Une chaîne de <const>7</const> caractères représentant l'état du plateau. Les caractères peuvent être :</p>
+        <p><span class="statement-lineno">Ligne 2 : </span><var>lastAction</var> - une chaîne de caractères indiquant le dernier coup joué par l'adversaire (ex: <const>d2 d4</const>). Au tout premier tour de la partie, cette valeur est <const>NONE</const>.</p>
+        <p><span class="statement-lineno">Les 7 lignes suivantes :</span> Une chaîne de <const>7</const> caractères représentant l'état du plateau (de haut en bas, ligne 7 à 1). Les caractères peuvent être :</p>
         <ul>
           <li><const>.</const> : Case vide</li>
-          <li><const>A</const> : Attaquant</li>
-          <li><const>D</const> : Défenseur</li>
+          <li><const>A</const> : Pièce Attaquante</li>
+          <li><const>D</const> : Pièce Défenseur</li>
           <li><const>K</const> : Le Roi</li>
         </ul>
       </div>
@@ -107,13 +108,13 @@
     <div class="blk">
       <div class="title">Sortie</div>
       <div class="text">
-        <span class="statement-lineno">Une seule ligne</span> contenant votre mouvement au format : <var>x1</var> <var>y1</var> <var>x2</var> <var>y2</var>.
+        <span class="statement-lineno">Une seule ligne</span> contenant votre coup en notation d'échecs : <var>case_depart</var> <var>case_arrivee</var>. 
         <br>
         <ul>
-            <li><var>x1</var>, <var>y1</var> : Les coordonnées de départ de la pièce que vous souhaitez déplacer.</li>
-            <li><var>x2</var>, <var>y2</var> : Les coordonnées d'arrivée de cette pièce.</li>
+            <li><var>case_depart</var> : Les coordonnées de départ de la pièce que vous souhaitez déplacer (ex: <const>d2</const>).</li>
+            <li><var>case_arrivee</var> : Les coordonnées de destination de cette pièce (ex: <const>d4</const>).</li>
         </ul>
-        Par exemple : <const>3 1 3 0</const> pour déplacer la pièce de la case (3,1) vers la case (3,0).
+        Par exemple : <const>d6 d7</const> pour déplacer la pièce de d6 vers d7.
         <br>
       </div>
     </div>

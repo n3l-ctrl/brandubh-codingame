@@ -15,6 +15,7 @@ public class Referee extends AbstractReferee {
     @Inject private GraphicEntityModule graphicEntityModule;
     
     private Board board;
+    private String lastActionStr = "NONE";
     private java.util.Map<Piece, com.codingame.gameengine.module.entities.Sprite> pieceEntities = new java.util.HashMap<>();
     private static final int CELL_SIZE = 126;
     private static final int OFFSET_X = 1920 / 2 - (Board.SIZE * CELL_SIZE) / 2;
@@ -145,11 +146,16 @@ public class Referee extends AbstractReferee {
             Move move = parseMove(output);
             
             if (move == null) {
-                throw new InvalidActionException("Invalid move format. Expected: x1 y1 x2 y2");
+                throw new InvalidActionException("Invalid move format. Expected: d2 d4");
             }
             
             applyMove(playerIdx, move);
             checkCaptures(move);
+            
+            lastActionStr = String.format("%c%c %c%c", 
+                (char)('a' + move.startX), (char)('7' - move.startY), 
+                (char)('a' + move.endX), (char)('7' - move.endY));
+            gameManager.addToGameSummary(player.getNicknameToken() + " played " + lastActionStr);
             
             String state = getBoardStateHash(1 - playerIdx);
             stateHistory.put(state, stateHistory.getOrDefault(state, 0) + 1);
@@ -177,6 +183,7 @@ public class Referee extends AbstractReferee {
     private void sendInputs(Player player) {
         int playerIdx = player.getIndex(); // 0 for Attackers, 1 for Defenders
         player.sendInputLine(String.valueOf(playerIdx));
+        player.sendInputLine(lastActionStr);
         
         for (int y = 0; y < Board.SIZE; y++) {
             StringBuilder sb = new StringBuilder();
@@ -192,13 +199,13 @@ public class Referee extends AbstractReferee {
     }
     
     private Move parseMove(String output) throws InvalidActionException {
-        Pattern p = Pattern.compile("^\\s*(?:MOVE\\s+)?(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)\\s*$");
+        Pattern p = Pattern.compile("^\\s*([a-gA-G])([1-7])\\s+([a-gA-G])([1-7])\\s*$");
         Matcher m = p.matcher(output);
         if (m.find()) {
-            int x1 = Integer.parseInt(m.group(1));
-            int y1 = Integer.parseInt(m.group(2));
-            int x2 = Integer.parseInt(m.group(3));
-            int y2 = Integer.parseInt(m.group(4));
+            int x1 = Character.toLowerCase(m.group(1).charAt(0)) - 'a';
+            int y1 = '7' - m.group(2).charAt(0);
+            int x2 = Character.toLowerCase(m.group(3).charAt(0)) - 'a';
+            int y2 = '7' - m.group(4).charAt(0);
             return new Move(x1, y1, x2, y2);
         }
         return null;

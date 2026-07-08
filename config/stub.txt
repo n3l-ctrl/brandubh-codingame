@@ -1,14 +1,16 @@
 gameloop
 read role:int
+read lastAction:word
 loop 7 read boardRow:word(7)
-write 3 1 3 0
+write d2 d4
 
 STATEMENT
 An ancient Celtic strategy game. A small group of defenders must help their king escape, while a large force of attackers tries to capture him.
 
 INPUT
 role: 0 or 1
+lastAction: The action played by the opponent (e.g. d2 d4). Is "NONE" on the very first turn.
 boardRow: A 7-character string representing a row of the board. '.' is empty, 'A' is attacker, 'D' is defender, 'K' is the king.
 
 OUTPUT
-3 1 3 0
+d2 d4
