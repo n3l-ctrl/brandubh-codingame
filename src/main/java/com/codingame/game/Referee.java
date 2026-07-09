@@ -144,7 +144,12 @@ public class Referee extends AbstractReferee {
     public void gameTurn(int turn) {
         this.currentTurn = turn;
         if (turn == 1 && introGroup != null) {
-            introGroup.setScale(1.0).setAlpha(0.0);
+            // Dezoom rapidly (0 to 0.3)
+            introGroup.setScale(1.0, com.codingame.gameengine.module.entities.Curve.EASE_OUT);
+            graphicEntityModule.commitEntityState(0.3, introGroup);
+        } else if (turn == 3 && introGroup != null) {
+            // Fade out smoothly during turn 3
+            introGroup.setAlpha(0.0);
         }
         
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
