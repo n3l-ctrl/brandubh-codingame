@@ -16,7 +16,6 @@ public class Referee extends AbstractReferee {
     
     private Board board;
     private String lastActionStr = "NONE";
-    private com.codingame.gameengine.module.entities.Group introGroup;
     private java.util.Map<Piece, com.codingame.gameengine.module.entities.Sprite> pieceEntities = new java.util.HashMap<>();
     private static final int CELL_SIZE = 126;
     private static final int OFFSET_X = 1920 / 2 - (Board.SIZE * CELL_SIZE) / 2;
@@ -29,21 +28,6 @@ public class Referee extends AbstractReferee {
         gameManager.setMaxTurns(200);
         drawBoard();
         drawHud();
-        
-        introGroup = graphicEntityModule.createGroup()
-            .setX(1920 / 2)
-            .setY(1080 / 2)
-            .setZIndex(100)
-            .setScale(4.0)
-            .setAlpha(1.0);
-
-        com.codingame.gameengine.module.entities.Sprite titleSprite = graphicEntityModule.createSprite()
-            .setImage("title.png")
-            .setX(0)
-            .setY(0)
-            .setAnchor(0.5);
-            
-        introGroup.add(titleSprite);
     }
     
     private void drawHud() {
@@ -143,14 +127,6 @@ public class Referee extends AbstractReferee {
     @Override
     public void gameTurn(int turn) {
         this.currentTurn = turn;
-        if (turn == 1 && introGroup != null) {
-            // Dezoom rapidly (0 to 0.3)
-            introGroup.setScale(1.0);
-            graphicEntityModule.commitEntityState(0.3, introGroup);
-        } else if (turn == 3 && introGroup != null) {
-            // Fade out smoothly during turn 3
-            introGroup.setAlpha(0.0);
-        }
         
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
         Player player = gameManager.getPlayer(playerIdx);
