@@ -30,8 +30,8 @@ public class Referee extends AbstractReferee {
         drawBoard();
         drawHud();
         
-        // Set a long duration for the init frame to play the cinematic
-        gameManager.setFrameDuration(3000); 
+        // Set a duration for the init frame so the intro animation is visible
+        gameManager.setFrameDuration(2000); 
 
         introGroup = graphicEntityModule.createGroup()
             .setX(1920 / 2)
@@ -48,18 +48,11 @@ public class Referee extends AbstractReferee {
             
         introGroup.add(titleSprite);
         
-        // t=0.0: Huge and transparent
+        // Start of init: Huge and transparent
         graphicEntityModule.commitEntityState(0.0, introGroup);
         
-        // t=0.2: Zoom down to normal size and become fully visible
+        // End of init: Normal size and fully visible. It freezes here!
         introGroup.setScale(1.0).setAlpha(1.0);
-        graphicEntityModule.commitEntityState(0.2, introGroup);
-        
-        // t=0.8: Stay frozen at normal size
-        graphicEntityModule.commitEntityState(0.8, introGroup);
-        
-        // t=1.0: Fade out before the first turn starts
-        introGroup.setAlpha(0.0);
         graphicEntityModule.commitEntityState(1.0, introGroup);
     }
     
@@ -160,7 +153,10 @@ public class Referee extends AbstractReferee {
     @Override
     public void gameTurn(int turn) {
         this.currentTurn = turn;
-        // The title animation is entirely handled in init() now.
+        // Hide the title when the game actually starts
+        if (turn == 1 && introGroup != null) {
+            introGroup.setVisible(false);
+        }
         
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
         Player player = gameManager.getPlayer(playerIdx);
