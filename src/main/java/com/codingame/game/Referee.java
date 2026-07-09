@@ -39,10 +39,10 @@ public class Referee extends AbstractReferee {
         for (Player player : gameManager.getPlayers()) {
             int x = player.getIndex() == 0 ? 100 : 1920 - 400;
             int y = 100;
-            
+            // HUD Background
             graphicEntityModule.createRectangle()
                 .setX(x - 20).setY(y - 20)
-                .setWidth(340).setHeight(140)
+                .setWidth(340).setHeight(120)
                 .setFillColor(0x222222)
                 .setLineColor(0x8B4513)
                 .setLineWidth(4)
@@ -51,23 +51,34 @@ public class Referee extends AbstractReferee {
             graphicEntityModule.createSprite()
                 .setImage(player.getAvatarToken())
                 .setX(x).setY(y)
-                .setBaseWidth(100).setBaseHeight(100);
+                .setBaseWidth(80).setBaseHeight(80);
                 
             graphicEntityModule.createText(player.getNicknameToken())
-                .setX(x + 120).setY(y + 20)
-                .setFontSize(40)
+                .setX(x + 100).setY(y + 10)
+                .setFontSize(35)
                 .setFillColor(0xFFFFFF)
                 .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD);
                 
             graphicEntityModule.createText(player.getIndex() == 0 ? "ATTACKERS" : "DEFENDERS")
-                .setX(x + 120).setY(y + 70)
-                .setFontSize(25)
+                .setX(x + 100).setY(y + 55)
+                .setFontSize(22)
                 .setFillColor(0xAAAAAA);
                 
+            // Last Move Box
+            graphicEntityModule.createRectangle()
+                .setX(x + 50).setY(y + 100)
+                .setWidth(200).setHeight(40)
+                .setFillColor(0x111111)
+                .setLineColor(0x8B4513)
+                .setLineWidth(2)
+                .setAlpha(0.8)
+                .setZIndex(-1);
+                
             lastMoveTexts[player.getIndex()] = graphicEntityModule.createText("")
-                .setX(x + 120).setY(y + 110)
-                .setFontSize(28)
-                .setFillColor(0xFFFFFF);
+                .setX(x + 150).setY(y + 120)
+                .setAnchor(0.5)
+                .setFontSize(24)
+                .setFillColor(0xEEEEEE);
         }
     }
     
