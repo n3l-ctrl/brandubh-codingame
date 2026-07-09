@@ -16,6 +16,7 @@ public class Referee extends AbstractReferee {
     
     private Board board;
     private String lastActionStr = "NONE";
+    private com.codingame.gameengine.module.entities.Text titleText;
     private java.util.Map<Piece, com.codingame.gameengine.module.entities.Sprite> pieceEntities = new java.util.HashMap<>();
     private static final int CELL_SIZE = 126;
     private static final int OFFSET_X = 1920 / 2 - (Board.SIZE * CELL_SIZE) / 2;
@@ -28,6 +29,14 @@ public class Referee extends AbstractReferee {
         gameManager.setMaxTurns(200);
         drawBoard();
         drawHud();
+        
+        titleText = graphicEntityModule.createText("BRANDUBH")
+            .setX(1920 / 2).setY(1080 / 2)
+            .setAnchor(0.5)
+            .setFontSize(250)
+            .setFillColor(0xFFFFFF)
+            .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD)
+            .setZIndex(100);
     }
     
     private void drawHud() {
@@ -127,6 +136,10 @@ public class Referee extends AbstractReferee {
     @Override
     public void gameTurn(int turn) {
         this.currentTurn = turn;
+        if (turn == 1 && titleText != null) {
+            titleText.setAlpha(0).setScale(2.0);
+        }
+        
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
         Player player = gameManager.getPlayer(playerIdx);
         
