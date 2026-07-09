@@ -350,18 +350,26 @@ public class Referee extends AbstractReferee {
         
         if (board.isCorner(x, y)) return true;
         
+        boolean targetIsAttacker = (capturingType != PieceType.ATTACKER);
+        
         if (board.isThrone(x, y)) {
-            if (capturingKing) return false;
-            if (capturingType == PieceType.ATTACKER) return true;
-            if (capturingType == PieceType.DEFENDER) {
-                return board.getPiece(3, 3) == null; // only hostile to defenders if King is not on it
+            Piece onThrone = board.getPiece(3, 3);
+            if (onThrone == null) {
+                if (capturingKing) return false; // Throne not hostile to King usually
+                return true;
+            } else {
+                if (targetIsAttacker) {
+                    return true; // King on throne is hostile to Attacker
+                } else {
+                    return false; // King on throne is NOT hostile to Defender
+                }
             }
         }
         
         Piece p = board.getPiece(x, y);
         if (p != null) {
-            if (capturingType == PieceType.ATTACKER) return p.getType() == PieceType.ATTACKER;
-            return p.getType() != PieceType.ATTACKER;
+            if (targetIsAttacker) return p.getType() != PieceType.ATTACKER;
+            return p.getType() == PieceType.ATTACKER;
         }
         return false;
     }
