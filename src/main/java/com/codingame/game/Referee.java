@@ -145,7 +145,7 @@ public class Referee extends AbstractReferee {
         this.currentTurn = turn;
         if (turn == 1 && introGroup != null) {
             // Dezoom rapidly (0 to 0.3)
-            introGroup.setScale(1.0, com.codingame.gameengine.module.entities.Curve.EASE_OUT);
+            introGroup.setScale(1.0);
             graphicEntityModule.commitEntityState(0.3, introGroup);
         } else if (turn == 3 && introGroup != null) {
             // Fade out smoothly during turn 3
