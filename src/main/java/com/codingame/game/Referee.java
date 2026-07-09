@@ -471,15 +471,59 @@ public class Referee extends AbstractReferee {
     }
     
     private void endGame(int winnerIdx) {
-        Player winner = gameManager.getPlayer(winnerIdx);
-        Player loser = gameManager.getPlayer(1 - winnerIdx);
+        if (winnerIdx != -1) {
+            gameManager.getPlayer(winnerIdx).setScore(1);
+            gameManager.getPlayer(1 - winnerIdx).setScore(-1);
+        } else {
+            gameManager.getPlayer(0).setScore(0);
+            gameManager.getPlayer(1).setScore(0);
+        }
         
-        if (winner.getScore() != -1) {
-            winner.setScore(1);
+        // --- Outro Cinematic ---
+        graphicEntityModule.createRectangle()
+            .setX(0).setY(0).setWidth(1920).setHeight(1080)
+            .setFillColor(0x000000).setAlpha(0.0)
+            .setZIndex(100)
+            .setAlpha(0.8, com.codingame.gameengine.module.entities.Curve.EASE_IN_AND_OUT);
+            
+        if (winnerIdx != -1) {
+            Player winner = gameManager.getPlayer(winnerIdx);
+            graphicEntityModule.createText(winner.getNicknameToken() + " WINS!")
+                .setX(1920/2).setY(1080/2 - 50)
+                .setAnchor(0.5)
+                .setFontSize(100)
+                .setFillColor(0xFFD700)
+                .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD)
+                .setZIndex(101)
+                .setAlpha(0.0)
+                .setScale(0.0)
+                .setAlpha(1.0, com.codingame.gameengine.module.entities.Curve.EASE_IN_AND_OUT)
+                .setScale(1.0, com.codingame.gameengine.module.entities.Curve.ELASTIC);
+                
+            graphicEntityModule.createText(winner.getIndex() == 0 ? "ATTACKERS" : "DEFENDERS")
+                .setX(1920/2).setY(1080/2 + 70)
+                .setAnchor(0.5)
+                .setFontSize(60)
+                .setFillColor(0xAAAAAA)
+                .setZIndex(101)
+                .setAlpha(0.0)
+                .setScale(0.0)
+                .setAlpha(1.0, com.codingame.gameengine.module.entities.Curve.EASE_IN_AND_OUT)
+                .setScale(1.0, com.codingame.gameengine.module.entities.Curve.ELASTIC);
+        } else {
+            graphicEntityModule.createText("DRAW")
+                .setX(1920/2).setY(1080/2)
+                .setAnchor(0.5)
+                .setFontSize(150)
+                .setFillColor(0xAAAAAA)
+                .setFontWeight(com.codingame.gameengine.module.entities.Text.FontWeight.BOLD)
+                .setZIndex(101)
+                .setAlpha(0.0)
+                .setScale(0.0)
+                .setAlpha(1.0, com.codingame.gameengine.module.entities.Curve.EASE_IN_AND_OUT)
+                .setScale(1.0, com.codingame.gameengine.module.entities.Curve.ELASTIC);
         }
-        if (loser.getScore() != -1) {
-            loser.setScore(0);
-        }
+        // -----------------------
         
         gameManager.endGame();
     }
