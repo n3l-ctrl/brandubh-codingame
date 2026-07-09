@@ -66,16 +66,15 @@ public class Referee extends AbstractReferee {
                 
             // Last Move Box
             graphicEntityModule.createRectangle()
-                .setX(x + 50).setY(y + 100)
-                .setWidth(200).setHeight(40)
+                .setX(x - 20).setY(y + 110)
+                .setWidth(340).setHeight(40)
                 .setFillColor(0x111111)
                 .setLineColor(0x8B4513)
-                .setLineWidth(2)
-                .setAlpha(0.8)
-                .setZIndex(-1);
+                .setLineWidth(4)
+                .setAlpha(0.8);
                 
             lastMoveTexts[player.getIndex()] = graphicEntityModule.createText("")
-                .setX(x + 150).setY(y + 120)
+                .setX(x + 150).setY(y + 130)
                 .setAnchor(0.5)
                 .setFontSize(24)
                 .setFillColor(0xEEEEEE);
