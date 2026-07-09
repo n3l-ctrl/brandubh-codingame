@@ -30,15 +30,12 @@ public class Referee extends AbstractReferee {
         drawBoard();
         drawHud();
         
-        // Set a duration for the init frame so the intro animation is visible
-        gameManager.setFrameDuration(2000); 
-
         introGroup = graphicEntityModule.createGroup()
             .setX(1920 / 2)
             .setY(1080 / 2)
             .setZIndex(100)
             .setScale(4.0)
-            .setAlpha(0.0);
+            .setAlpha(1.0);
 
         com.codingame.gameengine.module.entities.Sprite titleSprite = graphicEntityModule.createSprite()
             .setImage("title.png")
@@ -47,13 +44,6 @@ public class Referee extends AbstractReferee {
             .setAnchor(0.5);
             
         introGroup.add(titleSprite);
-        
-        // Start of init: Huge and transparent
-        graphicEntityModule.commitEntityState(0.0, introGroup);
-        
-        // End of init: Normal size and fully visible. It freezes here!
-        introGroup.setScale(1.0).setAlpha(1.0);
-        graphicEntityModule.commitEntityState(1.0, introGroup);
     }
     
     private void drawHud() {
@@ -153,9 +143,8 @@ public class Referee extends AbstractReferee {
     @Override
     public void gameTurn(int turn) {
         this.currentTurn = turn;
-        // Hide the title when the game actually starts
         if (turn == 1 && introGroup != null) {
-            introGroup.setVisible(false);
+            introGroup.setScale(1.0).setAlpha(0.0);
         }
         
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
