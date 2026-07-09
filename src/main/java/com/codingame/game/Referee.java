@@ -33,7 +33,9 @@ public class Referee extends AbstractReferee {
         introGroup = graphicEntityModule.createGroup()
             .setX(1920 / 2)
             .setY(1080 / 2)
-            .setZIndex(100);
+            .setZIndex(100)
+            .setScale(4.0)
+            .setAlpha(1.0);
 
         com.codingame.gameengine.module.entities.Sprite titleSprite = graphicEntityModule.createSprite()
             .setImage("title.png")
@@ -142,7 +144,7 @@ public class Referee extends AbstractReferee {
     public void gameTurn(int turn) {
         this.currentTurn = turn;
         if (turn == 1 && introGroup != null) {
-            introGroup.setAlpha(0).setScale(2.0);
+            introGroup.setAlpha(0.0).setScale(1.0);
         }
         
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
