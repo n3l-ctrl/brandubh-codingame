@@ -38,7 +38,7 @@
           <li>Le concept de limite de tours n'existe pas dans les règles officielles, mais est utilisé ici pour éviter les parties infinies.</li>
         </ul>
         <br>
-        <p><strong>Plateau et Coordonnées :</strong> Le jeu se déroule sur un plateau de 7x7. Chaque partie commence dans la position de départ standard décrite dans les règles officielles. Le plateau utilise la notation classique des échecs, où les colonnes vont de `a` à `g` (de gauche à droite) et les lignes de `1` à `7` (de bas en haut). La case en bas à gauche est donc `a1`.</p>
+        <p><strong>Plateau et Coordonnées :</strong> Le jeu se déroule sur un plateau de 7x7. Chaque partie commence dans la position de départ standard décrite dans les règles officielles. Le plateau utilise la notation classique des échecs, où les colonnes vont de <const>a</const> à <const>g</const> (de gauche à droite) et les lignes de <const>1</const> à <const>7</const> (de bas en haut). La case en bas à gauche est donc <const>a1</const>.</p>
         <p><strong>Déplacements :</strong> Les Attaquants jouent toujours en premier. Toutes les pièces se déplacent de façon orthogonale (comme la tour aux échecs) d'autant de cases vides qu'elles le souhaitent. Les pièces ne peuvent pas sauter par-dessus d'autres pièces.</p>
         <p><strong>Le Trône et les Coins :</strong> La case centrale (3,3) est le Trône. Les 4 cases dans les coins sont les zones d'évasion. Seul le Roi peut s'arrêter sur le Trône ou dans les coins. Les autres pièces peuvent passer <em>au-dessus</em> du Trône s'il est vide, mais ne peuvent pas s'y arrêter.</p>
         <p><strong>Pièces Hostiles :</strong> Les pièces de l'adversaire sont considérées comme des pièces hostiles. Le Trône et les quatre coins du plateau agissent <em>également</em> comme des pièces hostiles pour faciliter les captures.</p>
@@ -108,13 +108,13 @@
     <div class="blk">
       <div class="title">Sortie</div>
       <div class="text">
-        <span class="statement-lineno">Une seule ligne</span> contenant votre coup en notation d'échecs : <var>case_depart</var> <var>case_arrivee</var>. 
+        <span class="statement-lineno">Une seule ligne</span> contenant votre coup en notation d'échecs : <var>case_depart</var><var>case_arrivee</var>. 
         <br>
         <ul>
-            <li><var>case_depart</var> : Les coordonnées de départ de la pièce que vous souhaitez déplacer (ex: <const>d2</const>).</li>
-            <li><var>case_arrivee</var> : Les coordonnées de destination de cette pièce (ex: <const>d4</const>).</li>
+            <li><var>case_depart</var> : La case de départ de la pièce que vous souhaitez déplacer (ex: <const>d2</const>).</li>
+            <li><var>case_arrivee</var> : La case de destination de cette pièce (ex: <const>d4</const>).</li>
         </ul>
-        Par exemple : <const>d6 d7</const> pour déplacer la pièce de d6 vers d7.
+        Par exemple : <const>d6d7</const> pour déplacer la pièce de d6 vers d7.
         <br>
       </div>
     </div>
