@@ -36,18 +36,10 @@ public class Referee extends AbstractReferee {
         com.codingame.gameengine.module.entities.Sprite titleSprite = graphicEntityModule.createSprite()
             .setImage("title.png")
             .setX(1920 / 2)
-            .setY(1080 / 2 - 100)
+            .setY(1080 / 2)
             .setAnchor(0.5);
             
-        com.codingame.gameengine.module.entities.Sprite kingSprite = graphicEntityModule.createSprite()
-            .setImage("king.png")
-            .setBaseWidth(200)
-            .setBaseHeight(200)
-            .setX(1920 / 2)
-            .setY(1080 / 2 + 150)
-            .setAnchor(0.5);
-            
-        introGroup.add(titleSprite, kingSprite);
+        introGroup.add(titleSprite);
     }
     
     private void drawHud() {
