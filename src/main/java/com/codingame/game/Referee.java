@@ -31,12 +31,14 @@ public class Referee extends AbstractReferee {
         drawHud();
         
         introGroup = graphicEntityModule.createGroup()
+            .setX(1920 / 2)
+            .setY(1080 / 2)
             .setZIndex(100);
 
         com.codingame.gameengine.module.entities.Sprite titleSprite = graphicEntityModule.createSprite()
             .setImage("title.png")
-            .setX(1920 / 2)
-            .setY(1080 / 2)
+            .setX(0)
+            .setY(0)
             .setAnchor(0.5);
             
         introGroup.add(titleSprite);
