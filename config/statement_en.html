@@ -38,7 +38,7 @@
           <li>The concept of a turn limit doesn't exist in the official rules but is used here to prevent infinite games.</li>
         </ul>
         <br>
-        <p><strong>Board & Coordinates:</strong> The game is played on a 7x7 board. Every game starts from the standard opening position as described in the official rules. The board uses standard chess notation, where columns are `a` to `g` (left to right) and rows are `1` to `7` (bottom to top). The bottom-left square is `a1`.</p>
+        <p><strong>Board & Coordinates:</strong> The game is played on a 7x7 board. Every game starts from the standard opening position as described in the official rules. The board uses standard chess notation, where columns are <const>a</const> to <const>g</const> (left to right) and rows are <const>1</const> to <const>7</const> (bottom to top). The bottom-left square is <const>a1</const>.</p>
         <p><strong>Movement:</strong> The Attackers always move first. All pieces move orthogonally (like a rook in chess) any number of empty squares. Pieces cannot jump over other pieces.</p>
         <p><strong>The Throne and Corners:</strong> The center square (3,3) is the Throne. The 4 corner squares are the escape zones. Only the King can stop on the Throne or the corners. Other pieces can pass <em>over</em> the Throne if it is empty, but cannot land on it.</p>
         <p><strong>Hostile Pieces:</strong> The opponent's pieces are considered hostile pieces. The Throne and the corners <em>also</em> act as hostile pieces for the purpose of capturing.</p>
@@ -108,13 +108,13 @@
     <div class="blk">
       <div class="title">Output</div>
       <div class="text">
-        <span class="statement-lineno">A single line</span> containing your move in chess notation: <var>start_square</var> <var>end_square</var>. 
+        <span class="statement-lineno">A single line</span> containing your move in chess notation: <var>start_square</var><var>end_square</var>. 
         <br>
         <ul>
-            <li><var>start_square</var>: The starting coordinate of the piece you want to move (e.g. <const>d2</const>).</li>
-            <li><var>end_square</var>: The destination coordinate for that piece (e.g. <const>d4</const>).</li>
+            <li><var>start_square</var>: The starting square of the piece you want to move (e.g. <const>d2</const>).</li>
+            <li><var>end_square</var>: The destination square for that piece (e.g. <const>d4</const>).</li>
         </ul>
-        For example: <const>d6 d7</const> to move the piece from d6 to d7.
+        For example: <const>d6d7</const> to move the piece from d6 to d7.
         <br>
       </div>
     </div>

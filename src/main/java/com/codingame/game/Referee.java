@@ -9,13 +9,17 @@ import com.codingame.gameengine.core.AbstractReferee;
 import com.codingame.gameengine.core.MultiplayerGameManager;
 import com.codingame.gameengine.module.entities.GraphicEntityModule;
 import com.google.inject.Inject;
+import com.codingame.gameengine.module.tooltip.TooltipModule;
 
 public class Referee extends AbstractReferee {
     @Inject private MultiplayerGameManager<Player> gameManager;
     @Inject private GraphicEntityModule graphicEntityModule;
+    @Inject private TooltipModule tooltipModule;
     
     private Board board;
     private String lastActionStr = "NONE";
+    private com.codingame.gameengine.module.entities.Text[] lastMoveTexts = new com.codingame.gameengine.module.entities.Text[2];
+    private com.codingame.gameengine.module.entities.Rectangle[][] squareEntities = new com.codingame.gameengine.module.entities.Rectangle[7][7];
     private java.util.Map<Piece, com.codingame.gameengine.module.entities.Sprite> pieceEntities = new java.util.HashMap<>();
     private static final int CELL_SIZE = 126;
     private static final int OFFSET_X = 1920 / 2 - (Board.SIZE * CELL_SIZE) / 2;
@@ -28,6 +32,7 @@ public class Referee extends AbstractReferee {
         gameManager.setMaxTurns(200);
         drawBoard();
         drawHud();
+        updateTooltips();
     }
     
     private void drawHud() {
@@ -58,6 +63,11 @@ public class Referee extends AbstractReferee {
                 .setX(x + 120).setY(y + 70)
                 .setFontSize(25)
                 .setFillColor(0xAAAAAA);
+                
+            lastMoveTexts[player.getIndex()] = graphicEntityModule.createText("")
+                .setX(x + 120).setY(y + 110)
+                .setFontSize(28)
+                .setFillColor(0xFFFFFF);
         }
     }
     
@@ -73,20 +83,25 @@ public class Referee extends AbstractReferee {
             .setBaseHeight(1000)
             .setZIndex(-1);
 
+        for (int i = 0; i < Board.SIZE; i++) {
+            String col = String.valueOf((char)('a' + i));
+            graphicEntityModule.createText(col).setX(OFFSET_X + i * CELL_SIZE + CELL_SIZE/2).setY(OFFSET_Y - 40).setAnchor(0.5).setFontSize(40).setFillColor(0xDDDDDD);
+            graphicEntityModule.createText(col).setX(OFFSET_X + i * CELL_SIZE + CELL_SIZE/2).setY(OFFSET_Y + Board.SIZE * CELL_SIZE + 40).setAnchor(0.5).setFontSize(40).setFillColor(0xDDDDDD);
+            String row = String.valueOf((char)('7' - i));
+            graphicEntityModule.createText(row).setX(OFFSET_X - 40).setY(OFFSET_Y + i * CELL_SIZE + CELL_SIZE/2).setAnchor(0.5).setFontSize(40).setFillColor(0xDDDDDD);
+            graphicEntityModule.createText(row).setX(OFFSET_X + Board.SIZE * CELL_SIZE + 40).setY(OFFSET_Y + i * CELL_SIZE + CELL_SIZE/2).setAnchor(0.5).setFontSize(40).setFillColor(0xDDDDDD);
+        }
+
         for (int x = 0; x < Board.SIZE; x++) {
             for (int y = 0; y < Board.SIZE; y++) {
-                int color = 0x000000;
-                double alpha = 0.0;
-                
-                if (alpha > 0) {
-                    graphicEntityModule.createRectangle()
-                        .setX(OFFSET_X + x * CELL_SIZE)
-                        .setY(OFFSET_Y + y * CELL_SIZE)
-                        .setWidth(CELL_SIZE)
-                        .setHeight(CELL_SIZE)
-                        .setFillColor(color)
-                        .setAlpha(alpha);
-                }
+                squareEntities[x][y] = graphicEntityModule.createRectangle()
+                    .setX(OFFSET_X + x * CELL_SIZE)
+                    .setY(OFFSET_Y + y * CELL_SIZE)
+                    .setWidth(CELL_SIZE)
+                    .setHeight(CELL_SIZE)
+                    .setFillColor(0x000000)
+                    .setAlpha(0.0)
+                    .setZIndex(50);
             }
         }
         
@@ -104,6 +119,26 @@ public class Referee extends AbstractReferee {
                 .setZIndex(10);
             
             pieceEntities.put(p, s);
+        }
+    }
+    
+    private void updateTooltips() {
+        for (int x = 0; x < Board.SIZE; x++) {
+            for (int y = 0; y < Board.SIZE; y++) {
+                String coord = String.format("%c%c", (char)('a' + x), (char)('7' - y));
+                Piece p = board.getPiece(x, y);
+                String text = coord;
+                if (p != null) {
+                    if (p.getType() == PieceType.KING) text += "\nKing";
+                    else if (p.getType() == PieceType.ATTACKER) text += "\nAttacker";
+                    else if (p.getType() == PieceType.DEFENDER) text += "\nDefender";
+                } else if (board.isThrone(x, y)) {
+                    text += "\nThrone";
+                } else if (board.isCorner(x, y)) {
+                    text += "\nCorner";
+                }
+                tooltipModule.setTooltipText(squareEntities[x][y], text);
+            }
         }
     }
 
@@ -157,6 +192,9 @@ public class Referee extends AbstractReferee {
                 (char)('a' + move.startX), (char)('7' - move.startY), 
                 (char)('a' + move.endX), (char)('7' - move.endY));
             gameManager.addToGameSummary(player.getNicknameToken() + " played " + lastActionStr);
+            lastMoveTexts[playerIdx].setText(lastActionStr);
+            
+            updateTooltips();
             
             String state = getBoardStateHash(1 - playerIdx);
             stateHistory.put(state, stateHistory.getOrDefault(state, 0) + 1);
@@ -200,7 +238,7 @@ public class Referee extends AbstractReferee {
     }
     
     private Move parseMove(String output) throws InvalidActionException {
-        Pattern p = Pattern.compile("^\\s*([a-gA-G])([1-7])\\s+([a-gA-G])([1-7])\\s*$");
+        Pattern p = Pattern.compile("^\\s*([a-gA-G])([1-7])\\s*([a-gA-G])([1-7])\\s*$");
         Matcher m = p.matcher(output);
         if (m.find()) {
             int x1 = Character.toLowerCase(m.group(1).charAt(0)) - 'a';
@@ -218,15 +256,11 @@ public class Referee extends AbstractReferee {
         
         boolean isAttacker = p.getType() == PieceType.ATTACKER;
         if ((playerIdx == 0 && !isAttacker) || (playerIdx == 1 && isAttacker)) {
-            throw new InvalidActionException("Piece does not belong to the current player");
+            throw new InvalidActionException("Piece belongs to opponent");
         }
         
         if (move.startX == move.endX && move.startY == move.endY) {
             throw new InvalidActionException("Start is the same as destination");
-        }
-        
-        if (move.endX < 0 || move.endX >= Board.SIZE || move.endY < 0 || move.endY >= Board.SIZE) {
-            throw new InvalidActionException("Destination out of bounds");
         }
         
         if (board.getPiece(move.endX, move.endY) != null) {
@@ -253,7 +287,7 @@ public class Referee extends AbstractReferee {
         
         if (board.isThrone(move.endX, move.endY) || board.isCorner(move.endX, move.endY)) {
             if (p.getType() != PieceType.KING) {
-                throw new InvalidActionException("Only the King can move to the Throne or Corners");
+                throw new InvalidActionException("Moves a non-King piece to the Throne or a Corner");
             }
         }
         
@@ -412,13 +446,16 @@ public class Referee extends AbstractReferee {
         }
         
         if (king == null) {
-            gameManager.addTooltip(gameManager.getPlayer(0), "The Attackers captured the King!");
+            gameManager.addTooltip(gameManager.getPlayer(0), "Attackers captured the King!");
+            gameManager.addToGameSummary("Attackers captured the King!");
             endGame(0);
         } else if (board.isCorner(king.getX(), king.getY())) {
             gameManager.addTooltip(gameManager.getPlayer(1), "The King escaped!");
+            gameManager.addToGameSummary("The King escaped!");
             endGame(1);
         } else if (checkEncirclement()) {
-            gameManager.addTooltip(gameManager.getPlayer(0), "The Attackers encircled the Defenders!");
+            gameManager.addTooltip(gameManager.getPlayer(0), "Attackers encircled Defenders!");
+            gameManager.addToGameSummary("Attackers encircled Defenders!");
             endGame(0);
         }
     }
