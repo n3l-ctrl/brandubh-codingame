@@ -412,13 +412,13 @@ public class Referee extends AbstractReferee {
         }
         
         if (king == null) {
-            gameManager.addTooltip(gameManager.getPlayer(0), "Attackers captured the King!");
+            gameManager.addTooltip(gameManager.getPlayer(0), "The Attackers captured the King!");
             endGame(0);
         } else if (board.isCorner(king.getX(), king.getY())) {
             gameManager.addTooltip(gameManager.getPlayer(1), "The King escaped!");
             endGame(1);
         } else if (checkEncirclement()) {
-            gameManager.addTooltip(gameManager.getPlayer(0), "Attackers encircled the Defenders!");
+            gameManager.addTooltip(gameManager.getPlayer(0), "The Attackers encircled the Defenders!");
             endGame(0);
         }
     }
