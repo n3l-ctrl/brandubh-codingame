@@ -67,16 +67,16 @@ public class Referee extends AbstractReferee {
             // Last Move Box
             graphicEntityModule.createRectangle()
                 .setX(x - 20).setY(y + 110)
-                .setWidth(340).setHeight(40)
+                .setWidth(340).setHeight(70)
                 .setFillColor(0x111111)
                 .setLineColor(0x8B4513)
                 .setLineWidth(4)
                 .setAlpha(0.8);
                 
             lastMoveTexts[player.getIndex()] = graphicEntityModule.createText("")
-                .setX(x + 150).setY(y + 130)
+                .setX(x + 150).setY(y + 145)
                 .setAnchor(0.5)
-                .setFontSize(24)
+                .setFontSize(48)
                 .setFillColor(0xEEEEEE);
         }
     }
@@ -209,6 +209,7 @@ public class Referee extends AbstractReferee {
             String state = getBoardStateHash(1 - playerIdx);
             stateHistory.put(state, stateHistory.getOrDefault(state, 0) + 1);
             if (stateHistory.get(state) >= 3) {
+                gameManager.addToGameSummary("Repeated positions 3 times!");
                 gameManager.addTooltip(player, "Repeated position 3 times! " + player.getNicknameToken() + " loses!");
                 endGame(1 - playerIdx);
                 return;
@@ -313,6 +314,8 @@ public class Referee extends AbstractReferee {
         Piece moved = board.getPiece(move.endX, move.endY);
         if (moved == null) return;
         
+        java.util.List<String> capturedSquares = new java.util.ArrayList<>();
+        
         int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
         for (int[] d : dirs) {
             int adjX = move.endX + d[0];
@@ -334,9 +337,18 @@ public class Referee extends AbstractReferee {
                         board.removePiece(adj);
                         com.codingame.gameengine.module.entities.Sprite s = pieceEntities.get(adj);
                         if (s != null) s.setVisible(false);
+                        if (!capturingKing) {
+                            capturedSquares.add(String.format("%c%c", (char)('a' + adj.getX()), (char)('7' - adj.getY())));
+                        }
                     }
                 }
             }
+        }
+        
+        if (!capturedSquares.isEmpty()) {
+            int playerIdx = (moved.getType() == PieceType.ATTACKER) ? 0 : 1;
+            Player player = gameManager.getPlayer(playerIdx);
+            gameManager.addToGameSummary(player.getNicknameToken() + " captured the piece(s) at " + String.join(", ", capturedSquares));
         }
     }
     
@@ -393,15 +405,19 @@ public class Referee extends AbstractReferee {
             if ((p.getType() == PieceType.ATTACKER) == isAttacker) {
                 int[][] dirs = {{1,0}, {-1,0}, {0,1}, {0,-1}};
                 for (int[] d : dirs) {
-                    int nx = p.getX() + d[0];
-                    int ny = p.getY() + d[1];
-                    if (nx >= 0 && nx < Board.SIZE && ny >= 0 && ny < Board.SIZE) {
-                        if (board.getPiece(nx, ny) == null) {
-                            if (board.isThrone(nx, ny) || board.isCorner(nx, ny)) {
-                                if (p.getType() == PieceType.KING) return true;
-                            } else {
-                                return true;
-                            }
+                    int nx = p.getX();
+                    int ny = p.getY();
+                    while (true) {
+                        nx += d[0];
+                        ny += d[1];
+                        if (nx < 0 || nx >= Board.SIZE || ny < 0 || ny >= Board.SIZE) break;
+                        if (board.getPiece(nx, ny) != null) break;
+                        
+                        if (board.isThrone(nx, ny) || board.isCorner(nx, ny)) {
+                            if (p.getType() == PieceType.KING) return true;
+                            // non-King can slide through, but cannot stop here. Check next square in same direction.
+                        } else {
+                            return true; // found a valid square to stop on
                         }
                     }
                 }
