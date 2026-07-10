@@ -351,6 +351,6 @@ while True:
         ey = move[1] // 7
         def to_chess(x, y):
             return chr(ord('a') + x) + str(7 - y)
-        print(f"{to_chess(sx, sy)} {to_chess(ex, ey)}", flush=True)
+        print(f"{to_chess(sx, sy)}{to_chess(ex, ey)}", flush=True)
     else:
         print("WAIT", flush=True)
