@@ -94,6 +94,15 @@ public class Referee extends AbstractReferee {
             .setBaseWidth(1000)
             .setBaseHeight(1000)
             .setZIndex(-1);
+            
+        // Adding logo/title for preview export
+        graphicEntityModule.createSprite()
+            .setImage("title.png")
+            .setX(1920 / 2)
+            .setY(60)
+            .setAnchorX(0.5)
+            .setAnchorY(0.5)
+            .setZIndex(100);
 
         for (int i = 0; i < Board.SIZE; i++) {
             String col = String.valueOf((char)('a' + i));
