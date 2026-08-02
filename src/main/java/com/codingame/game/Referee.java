@@ -30,6 +30,7 @@ public class Referee extends AbstractReferee {
         board = new Board();
         gameManager.setTurnMaxTime(100);
         gameManager.setMaxTurns(200);
+        gameManager.setFrameDuration(3000);
         drawBoard();
         drawHud();
         updateTooltips();
@@ -102,12 +103,12 @@ public class Referee extends AbstractReferee {
             .setY(1080 / 2)
             .setAnchor(0.5)
             .setZIndex(100)
-            .setScale(0);
+            .setScale(3.0);
             
         graphicEntityModule.commitEntityState(0.0, logo);
         
-        logo.setScale(1.5, com.codingame.gameengine.module.entities.Curve.ELASTIC);
-        graphicEntityModule.commitEntityState(0.5, logo);
+        logo.setScale(1.0, com.codingame.gameengine.module.entities.Curve.ELASTIC);
+        graphicEntityModule.commitEntityState(0.8, logo);
         
         logo.setAlpha(0);
         graphicEntityModule.commitEntityState(1.0, logo);
@@ -190,6 +191,7 @@ public class Referee extends AbstractReferee {
 
     @Override
     public void gameTurn(int turn) {
+        gameManager.setFrameDuration(1000);
         this.currentTurn = turn;
         
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
