@@ -18,6 +18,7 @@ public class Referee extends AbstractReferee {
     
     private Board board;
     private String lastActionStr = "NONE";
+    private com.codingame.gameengine.module.entities.Sprite titleSprite;
     private com.codingame.gameengine.module.entities.Text[] lastMoveTexts = new com.codingame.gameengine.module.entities.Text[2];
     private com.codingame.gameengine.module.entities.Rectangle[][] squareEntities = new com.codingame.gameengine.module.entities.Rectangle[7][7];
     private java.util.Map<Piece, com.codingame.gameengine.module.entities.Sprite> pieceEntities = new java.util.HashMap<>();
@@ -30,7 +31,6 @@ public class Referee extends AbstractReferee {
         board = new Board();
         gameManager.setTurnMaxTime(100);
         gameManager.setMaxTurns(200);
-        gameManager.setFrameDuration(3000);
         drawBoard();
         drawHud();
         updateTooltips();
@@ -97,21 +97,13 @@ public class Referee extends AbstractReferee {
             .setZIndex(-1);
             
         // Adding logo/title for preview export with zoom effect at the center
-        com.codingame.gameengine.module.entities.Sprite logo = graphicEntityModule.createSprite()
+        titleSprite = graphicEntityModule.createSprite()
             .setImage("title.png")
             .setX(1920 / 2)
             .setY(1080 / 2)
             .setAnchor(0.5)
             .setZIndex(100)
-            .setScale(3.0);
-            
-        graphicEntityModule.commitEntityState(0.0, logo);
-        
-        logo.setScale(1.0, com.codingame.gameengine.module.entities.Curve.ELASTIC);
-        graphicEntityModule.commitEntityState(0.8, logo);
-        
-        logo.setAlpha(0);
-        graphicEntityModule.commitEntityState(1.0, logo);
+            .setScale(4.0);
 
         for (int i = 0; i < Board.SIZE; i++) {
             String col = String.valueOf((char)('a' + i));
@@ -191,8 +183,20 @@ public class Referee extends AbstractReferee {
 
     @Override
     public void gameTurn(int turn) {
-        gameManager.setFrameDuration(1000);
         this.currentTurn = turn;
+        if (turn == 1 && titleSprite != null) {
+            gameManager.setFrameDuration(2500);
+            
+            titleSprite.setScale(1.0, com.codingame.gameengine.module.entities.Curve.ELASTIC);
+            graphicEntityModule.commitEntityState(0.4, titleSprite);
+            
+            graphicEntityModule.commitEntityState(0.7, titleSprite);
+            
+            titleSprite.setAlpha(0);
+            graphicEntityModule.commitEntityState(1.0, titleSprite);
+        } else if (turn == 2) {
+            gameManager.setFrameDuration(1000);
+        }
         
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
         Player player = gameManager.getPlayer(playerIdx);
