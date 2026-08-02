@@ -95,14 +95,22 @@ public class Referee extends AbstractReferee {
             .setBaseHeight(1000)
             .setZIndex(-1);
             
-        // Adding logo/title for preview export
-        graphicEntityModule.createSprite()
+        // Adding logo/title for preview export with zoom effect at the center
+        com.codingame.gameengine.module.entities.Sprite logo = graphicEntityModule.createSprite()
             .setImage("title.png")
             .setX(1920 / 2)
-            .setY(60)
-            .setAnchorX(0.5)
-            .setAnchorY(0.5)
-            .setZIndex(100);
+            .setY(1080 / 2)
+            .setAnchor(0.5)
+            .setZIndex(100)
+            .setScale(0);
+            
+        graphicEntityModule.commitEntityState(0.0, logo);
+        
+        logo.setScale(1.5, com.codingame.gameengine.module.entities.Curve.ELASTIC);
+        graphicEntityModule.commitEntityState(0.5, logo);
+        
+        logo.setAlpha(0);
+        graphicEntityModule.commitEntityState(1.0, logo);
 
         for (int i = 0; i < Board.SIZE; i++) {
             String col = String.valueOf((char)('a' + i));
