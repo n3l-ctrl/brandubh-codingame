@@ -18,7 +18,7 @@ public class Referee extends AbstractReferee {
     
     private Board board;
     private String lastActionStr = "NONE";
-    private com.codingame.gameengine.module.entities.Sprite titleSprite;
+    private com.codingame.gameengine.module.entities.Group introGroup;
     private com.codingame.gameengine.module.entities.Text[] lastMoveTexts = new com.codingame.gameengine.module.entities.Text[2];
     private com.codingame.gameengine.module.entities.Rectangle[][] squareEntities = new com.codingame.gameengine.module.entities.Rectangle[7][7];
     private java.util.Map<Piece, com.codingame.gameengine.module.entities.Sprite> pieceEntities = new java.util.HashMap<>();
@@ -34,6 +34,23 @@ public class Referee extends AbstractReferee {
         drawBoard();
         drawHud();
         updateTooltips();
+        
+        introGroup = graphicEntityModule.createGroup()
+            .setScale(4.0)
+            .setAlpha(0.0)
+            .setZIndex(100);
+
+        com.codingame.gameengine.module.entities.Sprite titleSprite = graphicEntityModule.createSprite()
+            .setImage("title.png")
+            .setX(0)
+            .setY(0)
+            .setAnchor(0.5);
+            
+        introGroup.add(titleSprite);
+        introGroup.setX(1920 / 2).setY(1080 / 2);
+        
+        graphicEntityModule.commitEntityState(0.0, introGroup);
+        introGroup.setScale(1.0).setAlpha(1.0);
     }
     
     private void drawHud() {
@@ -95,15 +112,6 @@ public class Referee extends AbstractReferee {
             .setBaseWidth(1000)
             .setBaseHeight(1000)
             .setZIndex(-1);
-            
-        // Adding logo/title for preview export with zoom effect at the center
-        titleSprite = graphicEntityModule.createSprite()
-            .setImage("title.png")
-            .setX(1920 / 2)
-            .setY(1080 / 2)
-            .setAnchor(0.5)
-            .setZIndex(100)
-            .setScale(4.0);
 
         for (int i = 0; i < Board.SIZE; i++) {
             String col = String.valueOf((char)('a' + i));
@@ -184,18 +192,8 @@ public class Referee extends AbstractReferee {
     @Override
     public void gameTurn(int turn) {
         this.currentTurn = turn;
-        if (turn == 1 && titleSprite != null) {
-            gameManager.setFrameDuration(2000); // 2 seconds total
-            
-            titleSprite.setScale(1.0, com.codingame.gameengine.module.entities.Curve.ELASTIC);
-            graphicEntityModule.commitEntityState(0.15, titleSprite); // Zooms out very fast (in ~300ms)
-            
-            graphicEntityModule.commitEntityState(0.7, titleSprite); // Holds until t=0.7 (1400ms)
-            
-            titleSprite.setAlpha(0);
-            graphicEntityModule.commitEntityState(1.0, titleSprite); // Fades out completely by 2000ms
-        } else if (turn == 2) {
-            gameManager.setFrameDuration(1000);
+        if (turn == 1 && introGroup != null) {
+            introGroup.setAlpha(0).setScale(2.0);
         }
         
         int playerIdx = (turn - 1) % 2; // player 0: Attackers, player 1: Defenders
