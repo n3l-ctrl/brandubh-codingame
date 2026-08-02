@@ -39,12 +39,14 @@ public class Referee extends AbstractReferee {
         for (Player player : gameManager.getPlayers()) {
             int x = player.getIndex() == 0 ? 100 : 1920 - 400;
             int y = 100;
+            int playerColor = player.getColorToken();
+            
             // HUD Background
             graphicEntityModule.createRectangle()
                 .setX(x - 20).setY(y - 20)
                 .setWidth(340).setHeight(120)
                 .setFillColor(0x222222)
-                .setLineColor(0x8B4513)
+                .setLineColor(playerColor)
                 .setLineWidth(4)
                 .setAlpha(0.8);
                 
@@ -62,14 +64,14 @@ public class Referee extends AbstractReferee {
             graphicEntityModule.createText(player.getIndex() == 0 ? "ATTACKERS" : "DEFENDERS")
                 .setX(x + 100).setY(y + 55)
                 .setFontSize(22)
-                .setFillColor(0xAAAAAA);
+                .setFillColor(playerColor);
                 
             // Last Move Box
             graphicEntityModule.createRectangle()
                 .setX(x - 20).setY(y + 110)
                 .setWidth(340).setHeight(70)
                 .setFillColor(0x111111)
-                .setLineColor(0x8B4513)
+                .setLineColor(playerColor)
                 .setLineWidth(4)
                 .setAlpha(0.8);
                 
