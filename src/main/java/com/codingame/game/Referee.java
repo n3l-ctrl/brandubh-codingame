@@ -185,15 +185,15 @@ public class Referee extends AbstractReferee {
     public void gameTurn(int turn) {
         this.currentTurn = turn;
         if (turn == 1 && titleSprite != null) {
-            gameManager.setFrameDuration(2500);
+            gameManager.setFrameDuration(2000); // 2 seconds total
             
             titleSprite.setScale(1.0, com.codingame.gameengine.module.entities.Curve.ELASTIC);
-            graphicEntityModule.commitEntityState(0.4, titleSprite);
+            graphicEntityModule.commitEntityState(0.15, titleSprite); // Zooms out very fast (in ~300ms)
             
-            graphicEntityModule.commitEntityState(0.7, titleSprite);
+            graphicEntityModule.commitEntityState(0.7, titleSprite); // Holds until t=0.7 (1400ms)
             
             titleSprite.setAlpha(0);
-            graphicEntityModule.commitEntityState(1.0, titleSprite);
+            graphicEntityModule.commitEntityState(1.0, titleSprite); // Fades out completely by 2000ms
         } else if (turn == 2) {
             gameManager.setFrameDuration(1000);
         }
