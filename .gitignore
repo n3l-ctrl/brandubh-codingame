@@ -2,8 +2,7 @@
 /target/
 /.project
 /.classpath
-/solver/
-/solver2/
+/solver*/
 *.zip
 scratch_log.txt
 config/Boss.py3
